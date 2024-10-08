@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
-
 from app.db_models.base import Project, Ticket
+from typing import List
 
 # CRUD operations for Project
 
@@ -18,6 +18,11 @@ def create_project(db: Session, name: str, description: str) -> Project:
     return new_project
 
 
+# GET ALL - PAGINATED
+def get_projects(db: Session, skip: int = 0, limit: int = 10) -> List[Project]:
+    return db.query(Project).offset(skip).limit(limit).all()
+
+
 # GET BY ID
 # PROMPT - Define a function called get_project that retrieves a project record from the database by its ID. 
 # The function should accept a database session and a project ID as parameters. 
@@ -29,7 +34,7 @@ def get_project(db: Session, project_id: int) -> Project:
         raise HTTPException(status_code=404, detail=f"Project with ID {project_id} does not exist.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
-
+    
 
 # UPDATE
 # PROMPT -  Define a function called update_project that updates an existing project in the database. 

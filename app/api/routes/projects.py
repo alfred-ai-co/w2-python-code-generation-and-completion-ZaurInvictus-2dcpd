@@ -1,4 +1,5 @@
 # Project Endpoints
+from typing import List
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from fastapi import Depends
@@ -19,6 +20,20 @@ async def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
         project.description
         )
     return db_project
+
+# http://0.0.0.0:8000/api/projects?skip=0&limit=2
+@router.get('', response_model=List[ProjectResponse])
+async def list_projects(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    """
+    Endpoint to list projects with pagination.
+    example: http://0.0.0.0:8000/api/projects?skip=0&limit=2
+    Query Parameters:
+    - skip: Number of records to skip (default: 0)
+    - limit: Maximum number of records to return (default: 10)
+    """
+    projects = crud.get_projects(db, skip=skip, limit=limit)
+    return projects
+
 
 @router.get('/{project_id}', response_model=ProjectResponse)
 async def read_project(project_id: int, db: Session = Depends(get_db)):
